@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "React Flashcards",
+    "description":"Aplicativo de flashcard do curso nanodegree em react da udacity.",
     "slug": "reactnd-flashcards",
     "privacy": "public",
     "sdkVersion": "32.0.0",
@@ -24,6 +25,9 @@
     ],
     "ios": {
       "supportsTablet": true
+    },
+    "android": {
+      "package": "org.reactflashcards.exp"
     }
   }
 }

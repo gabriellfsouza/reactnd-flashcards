@@ -4,7 +4,7 @@ import { FontAwesome, MaterialIcons, MaterialCommunityIcons } from '@expo/vector
 import { red, orange, blue, lightPurp, pink, white } from './colors'
 import {Notifications,Permissions} from 'expo'
 
-const NOTIFICATION_KEY = 'UdaciFitness:notifications'
+const NOTIFICATION_KEY = 'FlashCards:notifications'
 
 export function getDailyReminderValue () {
   return {
@@ -187,31 +187,37 @@ export function createNotification(){
   }
 }
 
-export function setLocalNotification(){
+export function setLocalNotification () {
   AsyncStorage.getItem(NOTIFICATION_KEY)
-  .then(JSON.parse)
-  .then((data)=>{
-    if(data===null){
-      Permissions.askAsync(Permissions.NOTIFICATIONS)
-      .then(({status})=>{
-        if(status==='granted') Notifications.cancelAllScheduledNotificationsAsync()
+    .then(JSON.parse)
+    .then((data) => {
+      if (data === null) {
+        Permissions.askAsync(Permissions.NOTIFICATIONS)
+          .then(({ status }) => {
+            if (status === 'granted') {
+              Notifications.cancelAllScheduledNotificationsAsync()
 
-        let tomorrow = new Date()
-        tomorrow.setDate(tomorrow.getDate()+1)
-        tomorrow.setHours(20)
-        tomorrow.setMinutes(0)
+              let tomorrow = new Date();
+              //tomorrow.setMinutes(tomorrow.getMinutes() +1,0,0);
+              //tomorrow.setDate(tomorrow.getDate() + 1)
+              tomorrow.setHours(8)
+              tomorrow.setMintutes(0)
 
-        Notifications.scheduleLocalNotificationAsync(
-          createNotification(),{
-            time:tomorrow,
-            repeat:'day',
-            
+              Notifications.scheduleLocalNotificationsAsync(
+                createNotification(),
+                {
+                  time: tomorrow,
+                  repeat: 'day',
+                }
+              )
+
+              AsyncStorage.setItem(NOTIFICATION_KEY, JSON.stringify(true))
+            }else{
+              debugger;
+            }
           })
-        AsyncStorage.setItem(NOTIFICATION_KEY,JSON.stringify(true))
-
-      })
-    }
-  })
+      }
+    })
 }
 
 

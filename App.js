@@ -12,7 +12,7 @@ import Baralho from './components/Baralho';
 import Quiz from './components/Quiz';
 import Pergunta from  './components/Pergunta';
 
-import {purple,white} from './utils/colors';
+import {setLocalNotification} from './utils/helpers'
 import middleware from './middleware';
 import reducer from './reducers';
 
@@ -92,6 +92,9 @@ const MainNavigator = StackNavigator({
 
 
 export default class App extends React.Component {
+  componentDidMount() {
+    setLocalNotification()
+  }
   render() {
     return (
       <Provider store={createStore(reducer,middleware)}>
