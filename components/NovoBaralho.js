@@ -21,9 +21,10 @@ class NovoBaralho extends Component{
         dispatch(handleAdicionaBaralho(nome))
         .then(()=>{
 
-            this.props.navigation.dispatch(NavigationActions.back({
+            /*this.props.navigation.dispatch(NavigationActions.back({
                 key:'NovoBaralho'
-            }))
+            }))*/
+            this.props.navigation.navigate('Baralho',{tituloBaralho:nome});
             
             this.setState({nome:''});
         })

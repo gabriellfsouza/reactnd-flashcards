@@ -23,13 +23,16 @@ class Baralho extends Component{
     handleIniciaQuiz = ()=>{
         const {navigate,state} = this.props.navigation; 
         const {tituloBaralho,cartas} = this.props.baralho;
-        if(cartas.length>0) navigate('Quiz',{
+        let navega = null;
+        debugger;
+        if(cartas.length>0) navega = navigate('Quiz',{
                                                 tituloBaralho,
                                                 idxPergunta:1,
                                                 arrAcertos:[],
                                                 GO_BACK_KEY:state.key
                                             });
         else (alert('Adicione ao menos um card ao baralho.'));
+        console.log('var nav',navega);
     }
 
     render(){

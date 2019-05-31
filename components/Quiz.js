@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
-import {View,Text,TouchableNativeFeedback,TouchableOpacity} from 'react-native';
-import {NavigationActions} from 'react-navigation';
+import {View,Text,TouchableNativeFeedback,TouchableOpacity,Alert} from 'react-native';
+import {NavigationActions,StackActions } from 'react-navigation';
 import {connect} from 'react-redux';
 import BotaoPadrao from './utils/BotaoPadrao';
+import {clearLocalNotification,setLocalNotification} from '../utils/helpers';
 
 
 function Verso ({onPress,children,...props}){
@@ -36,9 +37,55 @@ class Quiz extends Component{
     }
 
     static navigationOptions = ({navigation})=>{
+        debugger;
         return {
             title:'Quiz'
         }
+    }
+
+    alerta = (mensagem)=>{
+        Alert.alert(
+            'Fim do quiz',
+            mensagem,
+            [
+                {text:'Recomeçar Quiz',onPress:this.recomecarQuiz},
+                {text:'Voltar ao Baralho',onPress:this.voltarAoBaralho}
+            ]
+        );
+    }
+
+    recomecarQuiz = ()=>{
+        debugger;
+        const {baralho,idxPergunta,GO_BACK_KEY,tituloBaralho,arrAcertos} = this.props;
+        
+        const resetAction = NavigationActions.reset({
+            index:2,
+            actions:[NavigationActions.navigate({routeName:'Home'}),
+                    NavigationActions.navigate({routeName:'Baralho',params: {tituloBaralho}}),
+                    NavigationActions.navigate({routeName:'Quiz',params: {
+                        tituloBaralho,
+                        idxPergunta:1,
+                        arrAcertos:[],
+                        GO_BACK_KEY:GO_BACK_KEY
+                    }})]
+        })
+
+        this.props.navigation.dispatch(resetAction);
+                                                
+    }
+
+    voltarAoBaralho = () =>{
+        debugger;
+        const {baralho,idxPergunta} = this.props;
+        const {tituloBaralho} = baralho;
+        const resetAction = NavigationActions.reset({
+            index:1,
+            actions:[NavigationActions.navigate({routeName:'Home'}),
+                    NavigationActions.navigate({routeName:'Baralho',params: {tituloBaralho}})]
+        })
+
+        this.props.navigation.dispatch(resetAction);
+        
     }
 
 
@@ -48,16 +95,19 @@ class Quiz extends Component{
         const {arrAcertos,idxPergunta,baralho,GO_BACK_KEY} = this.props;
         const maximo = baralho.cartas.length;
         const {tituloBaralho} = baralho;
-        arrAcertos.push(acerto);
+        const novoArrAcertos = [...arrAcertos]
+        novoArrAcertos.push(acerto);
         console.log('GO_BACK_KEY',GO_BACK_KEY);
         
         if(idxPergunta<maximo){
-            this.props.navigation.navigate('Quiz',{tituloBaralho,idxPergunta:idxPergunta+1,arrAcertos,GO_BACK_KEY});
+            this.props.navigation.navigate('Quiz',{tituloBaralho,idxPergunta:idxPergunta+1,arrAcertos:[...novoArrAcertos],GO_BACK_KEY});
         }else{
-            const qtdAcertos = arrAcertos.filter(acerto=>acerto===true);
-            const erros = arrAcertos.filter(acerto=>acerto===false);
-            alert(`Resultado final, da(s) ${arrAcertos.length} pergunta(s) você acertou ${qtdAcertos.length} e errou ${erros.length}!`);
-            this.props.navigation.dispatch(NavigationActions.back({key: GO_BACK_KEY}));
+            const qtdAcertos = novoArrAcertos.filter(acerto=>acerto===true);
+            const erros = novoArrAcertos.filter(acerto=>acerto===false);
+            this.alerta(`Resultado final, da(s) ${novoArrAcertos.length} pergunta(s) você acertou ${qtdAcertos.length} e errou ${erros.length}!`);
+            
+            clearLocalNotification()
+            .then(setLocalNotification)
             //this.props.navigation.goBack(GO_BACK_KEY);
         }
     }
@@ -111,13 +161,14 @@ class Quiz extends Component{
 
 function mapStateToProps(baralhos,props){
     const {tituloBaralho,idxPergunta,arrAcertos,GO_BACK_KEY} = props.navigation.state.params;
-    //debugger;
+    debugger;
     return {
         ...props,
         baralho:baralhos[tituloBaralho],
         idxPergunta,
         arrAcertos,
-        GO_BACK_KEY
+        GO_BACK_KEY,
+        tituloBaralho
     }
 }
 
